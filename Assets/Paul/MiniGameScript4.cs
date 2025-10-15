@@ -13,6 +13,10 @@ public class MiniGameScript4 : MonoBehaviour
     {
         InvokeRepeating(nameof(SpawnerEnnemi), 1f, spawnTime);
     }
+    private void OnDisable()
+    {
+        CancelInvoke(nameof(SpawnerEnnemi));
+    }
     void Update()
     {
         float mouvement = Input.GetAxisRaw("Horizontal"); // -1 (gauche), 0, 1 (droite)
