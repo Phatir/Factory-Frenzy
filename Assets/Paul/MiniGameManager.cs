@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class MiniGameManager : MonoBehaviour
 {
@@ -12,6 +13,11 @@ public class MiniGameManager : MonoBehaviour
 
     [Header("UI de transition (Image noire en overlay)")]
     public Image fadeImage;
+
+    [Header("Texte d’instruction du mini-jeu")]
+    public TextMeshProUGUI gameNameText;
+    public float displayGameNameDuration = 2f;
+    public float textFadeDuration = 0.7f;
 
     [Header("Paramètres du fondu visuel")]
     public float fadeDuration = 1f;
@@ -25,6 +31,9 @@ public class MiniGameManager : MonoBehaviour
     [Header("Son de transition (joué entre deux mini-jeux)")]
     public AudioClip transitionSound;
     public float transitionVolume = 1f;
+
+    [Header("Délai avant que le premier mini-jeu commence (pour lire l’instruction)")]
+    public float firstGameDelay = 2f;
 
     private int currentIndex = 0;
     private float timer = 0f;
@@ -42,35 +51,61 @@ public class MiniGameManager : MonoBehaviour
             return;
         }
 
-        // Complète la liste des durées manquantes
         while (durations.Count < miniGames.Count)
             durations.Add(10f);
 
-        // Désactive tout sauf le premier
+        // Désactive tous les mini-jeux
         for (int i = 0; i < miniGames.Count; i++)
-        {
-            miniGames[i].SetActive(i == 0);
-        }
+            miniGames[i].SetActive(false);
 
-        // Configure l'audio du premier mini-jeu
+        // Prépare l’audio du premier mini-jeu
         currentAudio = miniGames[0].GetComponent<AudioSource>();
         if (currentAudio != null)
-        {
             currentAudio.volume = 1f;
-            if (!currentAudio.isPlaying)
-                currentAudio.Play();
-        }
 
-        // Prépare la source sonore pour les transitions
+        // Source pour les sons de transition
         transitionAudioSource = gameObject.AddComponent<AudioSource>();
         transitionAudioSource.playOnAwake = false;
         transitionAudioSource.volume = transitionVolume;
 
+        // Fade visuel et texte
+        if (fadeImage != null)
+            SetFadeAlpha(1f); // Commence noir
+        if (gameNameText != null)
+        {
+            gameNameText.gameObject.SetActive(true);
+            SetTextAlpha(0f);
+            gameNameText.text =  miniGames[0].name;
+        }
+
+        // Lance la première instruction avec fade-in et début du mini-jeu après delay
+        StartCoroutine(FirstGameStart());
+    }
+
+    private System.Collections.IEnumerator FirstGameStart()
+    {
+        // Fade-in du texte d’instruction
+        if (gameNameText != null)
+            yield return StartCoroutine(FadeText(1f));
+
+        // Petite pause pour que le joueur lise
+        yield return new WaitForSeconds(firstGameDelay);
+
+        // Active le premier mini-jeu
+        miniGames[0].SetActive(true);
         timer = durations[0];
 
-        // Initialise le fondu visuel
+        // Fade-out du texte
+        if (gameNameText != null)
+            yield return StartCoroutine(FadeText(0f));
+
+        // Fade-in visuel de l’écran
         if (fadeImage != null)
-            SetFadeAlpha(0f);
+            yield return StartCoroutine(Fade(0f));
+
+        // Joue l’audio du premier mini-jeu si disponible
+        if (currentAudio != null)
+            currentAudio.Play();
     }
 
     void Update()
@@ -79,50 +114,38 @@ public class MiniGameManager : MonoBehaviour
             return;
 
         timer -= Time.deltaTime;
-
         if (timer <= 0f)
-        {
             StartCoroutine(TransitionToNextGame());
-        }
+
     }
 
     private System.Collections.IEnumerator TransitionToNextGame()
     {
         isTransitioning = true;
 
-        // Lancer le fade visuel et audio du mini-jeu actuel
+        // Fade-out visuel et audio du mini-jeu actuel
         var fadeVisual = Fade(1f);
         var fadeAudioOut = FadeAudio(currentAudio, 0f);
-
         yield return StartCoroutine(fadeVisual);
-        if (fadeAudioOut != null)
-            yield return StartCoroutine(fadeAudioOut);
+        if (fadeAudioOut != null) yield return StartCoroutine(fadeAudioOut);
 
-        // Joue le son de transition (whoosh, click, etc.)
-        if (transitionSound != null && transitionAudioSource != null)
-        {
+        // Son de transition
+        if (transitionSound != null)
             transitionAudioSource.PlayOneShot(transitionSound, transitionVolume);
-        }
 
         // Désactive le mini-jeu actuel
         miniGames[currentIndex].SetActive(false);
 
         // Passe au suivant
         currentIndex++;
-
-        // Si on arrive à la fin
         if (currentIndex >= miniGames.Count)
         {
             if (loop)
-            {
                 currentIndex = 0;
-            }
             else
             {
-                Debug.Log("Tous les mini-jeux sont terminés !");
-                yield return new WaitForSeconds(transitionSound != null ? transitionSound.length : 0.5f);
                 if (fadeImage != null)
-                    yield return StartCoroutine(Fade(1f)); // écran noir final
+                    yield return StartCoroutine(Fade(1f));
                 yield break;
             }
         }
@@ -131,7 +154,7 @@ public class MiniGameManager : MonoBehaviour
         miniGames[currentIndex].SetActive(true);
         timer = durations[currentIndex];
 
-        // Gère l’audio du nouveau mini-jeu
+        // Joue le son du mini-jeu
         nextAudio = miniGames[currentIndex].GetComponent<AudioSource>();
         if (nextAudio != null)
         {
@@ -139,62 +162,78 @@ public class MiniGameManager : MonoBehaviour
             nextAudio.Play();
         }
 
-        // Attendre un petit moment pour laisser respirer la transition sonore
-        if (transitionSound != null)
-            yield return new WaitForSeconds(transitionSound.length * 0.3f);
+        // Affiche l’instruction du mini-jeu
+        if (gameNameText != null)
+        {
+            gameNameText.text = /*"Prochain jeu : " + */miniGames[currentIndex].name;
+            gameNameText.gameObject.SetActive(true);
+            yield return StartCoroutine(FadeText(1f));
+        }
 
-        // Fade-in visuel et audio du nouveau jeu
+        yield return new WaitForSeconds(transitionSound != null ? transitionSound.length * 0.3f : 0.3f);
+
+        // Fade-in visuel et audio
         var fadeVisualIn = Fade(0f);
         var fadeAudioIn = FadeAudio(nextAudio, 1f);
-
         yield return StartCoroutine(fadeVisualIn);
-        if (fadeAudioIn != null)
-            yield return StartCoroutine(fadeAudioIn);
+        if (fadeAudioIn != null) yield return StartCoroutine(fadeAudioIn);
+
+        // Masque le texte après displayGameNameDuration
+        if (gameNameText != null)
+        {
+            yield return new WaitForSeconds(displayGameNameDuration);
+            yield return StartCoroutine(FadeText(0f));
+            gameNameText.gameObject.SetActive(false);
+        }
 
         currentAudio = nextAudio;
         isTransitioning = false;
     }
 
+    // Fade visuel
     private System.Collections.IEnumerator Fade(float targetAlpha)
     {
-        if (fadeImage == null)
-            yield break;
-
+        if (fadeImage == null) yield break;
         float startAlpha = fadeImage.color.a;
         float t = 0f;
-
         while (t < fadeDuration)
         {
             t += Time.deltaTime;
-            float blend = Mathf.Clamp01(t / fadeDuration);
-            float alpha = Mathf.Lerp(startAlpha, targetAlpha, blend);
-            SetFadeAlpha(alpha);
+            SetFadeAlpha(Mathf.Lerp(startAlpha, targetAlpha, Mathf.Clamp01(t / fadeDuration)));
             yield return null;
         }
-
         SetFadeAlpha(targetAlpha);
     }
 
+    // Fade audio
     private System.Collections.IEnumerator FadeAudio(AudioSource audio, float targetVolume)
     {
-        if (audio == null)
-            yield break;
-
+        if (audio == null) yield break;
         float startVolume = audio.volume;
         float t = 0f;
-
         while (t < audioFadeDuration)
         {
             t += Time.deltaTime;
-            float blend = Mathf.Clamp01(t / audioFadeDuration);
-            audio.volume = Mathf.Lerp(startVolume, targetVolume, blend);
+            audio.volume = Mathf.Lerp(startVolume, targetVolume, Mathf.Clamp01(t / audioFadeDuration));
             yield return null;
         }
-
         audio.volume = targetVolume;
+        if (targetVolume == 0f) audio.Stop();
+    }
 
-        if (targetVolume == 0f)
-            audio.Stop();
+    // Fade texte
+    private System.Collections.IEnumerator FadeText(float targetAlpha)
+    {
+        if (gameNameText == null) yield break;
+        float startAlpha = gameNameText.color.a;
+        float t = 0f;
+        while (t < textFadeDuration)
+        {
+            t += Time.deltaTime;
+            SetTextAlpha(Mathf.Lerp(startAlpha, targetAlpha, Mathf.Clamp01(t / textFadeDuration)));
+            yield return null;
+        }
+        SetTextAlpha(targetAlpha);
     }
 
     private void SetFadeAlpha(float alpha)
@@ -202,5 +241,12 @@ public class MiniGameManager : MonoBehaviour
         Color c = fadeImage.color;
         c.a = alpha;
         fadeImage.color = c;
+    }
+
+    private void SetTextAlpha(float alpha)
+    {
+        Color c = gameNameText.color;
+        c.a = alpha;
+        gameNameText.color = c;
     }
 }
