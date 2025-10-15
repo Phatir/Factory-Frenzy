@@ -7,6 +7,8 @@ TagManager:
   - Hand
   - Car
   - Enemy
+  - Clothes
+  - Sol
   layers:
   - Default
   - TransparentFX
