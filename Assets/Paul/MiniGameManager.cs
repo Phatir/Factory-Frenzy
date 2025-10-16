@@ -51,8 +51,8 @@ public class MiniGameManager : MonoBehaviour
             return;
         }
 
-        while (durations.Count < miniGames.Count)
-            durations.Add(10f);
+        //while (durations.Count < miniGames.Count)
+        //    durations.Add(10f);
 
         // Désactive tous les mini-jeux
         for (int i = 0; i < miniGames.Count; i++)

@@ -4,12 +4,10 @@ public class MiniGameScript6 : MonoBehaviour
 {
     public float vitesseX = 5f;
     public float vitesseY = 5f;
+    [Header("Points gagnés à la réussite")]
+    public int pointsReward = 10;
+    private bool gameCompleted = false;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-
-    }
 
     void Update()
     {
@@ -23,7 +21,15 @@ public class MiniGameScript6 : MonoBehaviour
         if (collision.gameObject.tag == "Sol")
         {
             vitesseY = 0;
+            CompleteMiniGame();
         }
+    }
+    void CompleteMiniGame()
+    {
+        gameCompleted = true;
+        Debug.Log("Mini-jeu terminé !");
+        ScoreManager.Instance.AddScore(pointsReward);
+        gameCompleted = false;
     }
 }
 

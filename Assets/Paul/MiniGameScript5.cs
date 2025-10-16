@@ -5,6 +5,10 @@ public class MiniGameScript5 : MonoBehaviour
     public float vitesse = 5f;
     public GameObject clothes;
     public Transform[] spawnAreas;
+
+    [Header("Points gagnés à la réussite")]
+    public int pointsReward = 10;
+    private bool gameCompleted = false;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -37,9 +41,19 @@ public class MiniGameScript5 : MonoBehaviour
         {
             print("ça touche");
             vitesse = 0;
+            clothes = null;
+            CompleteMiniGame();
             
 
 
         }
+    }
+
+    void CompleteMiniGame()
+    {
+        gameCompleted = true;
+        Debug.Log("Mini-jeu terminé !");
+        ScoreManager.Instance.AddScore(pointsReward);
+        gameCompleted = false;
     }
 }
