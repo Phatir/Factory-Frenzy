@@ -15,6 +15,19 @@ public class MiniGameScript2 : MonoBehaviour
     public float carSpeed;
 
     private float delai;
+    [Header("Points gagnés à la réussite")]
+    public int pointsReward = 10;
+
+    private bool gameCompleted = false;
+
+
+    void CompleteMiniGame()
+    {
+        gameCompleted = true;
+        Debug.Log("Mini-jeu terminé !");
+        ScoreManager.Instance.AddScore(pointsReward);
+        gameCompleted = false;
+    }
 
     private void Start()
     {
@@ -38,6 +51,11 @@ public class MiniGameScript2 : MonoBehaviour
         {
             Sauter();
         }
+        if(gameCompleted)
+        {
+            CompleteMiniGame();
+        }
+        
     }
 
     void Sauter()
@@ -52,8 +70,13 @@ public class MiniGameScript2 : MonoBehaviour
     {
         if (other.gameObject.tag == "Car")
         {
-            Time.timeScale = 0f;
+            gameCompleted = false;
         }
+        else if (other.gameObject.tag == "Above")
+        {
+            gameCompleted = true;
+        }
+
     }
 
 }

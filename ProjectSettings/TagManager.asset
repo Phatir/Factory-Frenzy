@@ -9,6 +9,7 @@ TagManager:
   - Enemy
   - Clothes
   - Sol
+  - Above
   layers:
   - Default
   - TransparentFX
