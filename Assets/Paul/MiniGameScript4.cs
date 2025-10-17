@@ -9,9 +9,14 @@ public class MiniGameScript4 : MonoBehaviour
     public Transform[] spawnAreas;
     public float spawnTime = 2f;
 
+    [Header("Points gagnés à la réussite")]
+    public int pointsReward = 10;
+    private bool gameCompleted = false;
+
     private void Start()
     {
         InvokeRepeating(nameof(SpawnerEnnemi), 1f, spawnTime);
+        CompleteMiniGame();
     }
     private void OnDisable()
     {
@@ -40,8 +45,16 @@ public class MiniGameScript4 : MonoBehaviour
         if (other.gameObject.tag == "Enemy")
         {
             print("ça touche");
-            Time.timeScale = 0f;
+            ScoreManager.Instance.AddScore(-pointsReward);
+
 
         }
+    }
+    void CompleteMiniGame()
+    {
+        gameCompleted = true;
+        Debug.Log("Mini-jeu terminé !");
+        ScoreManager.Instance.AddScore(pointsReward);
+        gameCompleted = false;
     }
 }

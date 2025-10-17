@@ -203,10 +203,11 @@ MonoBehaviour:
   - {fileID: 1510193672}
   - {fileID: 1509642299}
   durations:
-  - 5
-  - 5
-  - 5
-  - 5
+  - 3
+  - 3
+  - 3
+  - 4
+  - 4
   - 5
   - 5
   fadeImage: {fileID: 1059614613}
@@ -244,7 +245,7 @@ Transform:
   m_GameObject: {fileID: 57876062}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 7.5866685, y: -2.5238445, z: -2.2683585}
+  m_LocalPosition: {x: 7.5866685, y: -2.5238445, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -702,15 +703,15 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 62
+  m_fontSizeBase: 62
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -740,7 +741,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 0, y: 0, z: -129.28586, w: -29.761475}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -770,7 +771,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -832.7, y: 437}
+  m_AnchoredPosition: {x: -850, y: 469}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &293165577
@@ -1315,6 +1316,7 @@ MonoBehaviour:
   player: {fileID: 1954371686}
   playerDistance: 3
   playerSpeed: 0.5
+  pointsReward: 10
 --- !u!1 &715938487
 GameObject:
   m_ObjectHideFlags: 0
@@ -1395,7 +1397,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 78619b6c4f1fcc04d99b0150c37eb69d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1444,6 +1446,7 @@ MonoBehaviour:
   - {fileID: 1796037822}
   - {fileID: 12941518}
   - {fileID: 1566800199}
+  pointsReward: 10
 --- !u!54 &715938493
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2036,6 +2039,7 @@ MonoBehaviour:
   - {fileID: 1653076469}
   - {fileID: 1721027387}
   spawnTime: 1
+  pointsReward: 10
 --- !u!1 &840675073
 GameObject:
   m_ObjectHideFlags: 0
@@ -4622,8 +4626,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45c5dbd76a1a2f64081a88a0fd9e85d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vitesseX: 5
+  vitesseX: 2
   vitesseY: 5
+  pointsReward: 10
 --- !u!1 &2033229986
 GameObject:
   m_ObjectHideFlags: 0
